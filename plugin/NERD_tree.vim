@@ -1223,10 +1223,21 @@ endfunction
 "FUNCTION: TreeFileNode.openInNewTab(options) {{{3
 function! s:TreeFileNode.openInNewTab(options)
     let currentTab = tabpagenr()
-
+    let found = 0
+    
     if !has_key(a:options, 'keepTreeOpen')
         call s:closeTreeIfQuitOnOpen()
     endif
+
+   for i in range(tabpagenr('$'))
+        let tablist = tabpagebuflist(i + 1)
+        for tbuf in tablist
+            if bufname(tbuf)==self.path.str({'format': 'Edit'})
+                exec "tabn " . (i+1)
+                return
+            endif
+        endfor
+    endfor
 
     exec "tabedit " . self.path.str({'format': 'Edit'})
 
